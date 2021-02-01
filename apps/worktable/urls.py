@@ -1,4 +1,5 @@
 from django.urls import path
+from rest_framework.urlpatterns import format_suffix_patterns
 
 from worktable import views, views_order
 
@@ -21,3 +22,5 @@ urlpatterns = [
     path('order/confirm/', views_order.WorkOrderConfirmView.as_view(), name='order-confirm'),
 
 ]
+
+urlpatterns = format_suffix_patterns(urlpatterns)

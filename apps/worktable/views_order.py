@@ -1,6 +1,11 @@
-from json import dumps as json_dumps
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from json import dumps as json_dumps
+
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .serializers import WorkOrderLogSerializer, WorkOrderSerializer
 
 from django.contrib.auth import get_user_model
 from django.db.models import Q
@@ -21,7 +26,6 @@ User = get_user_model()
 
 """
 Here is WorkOrder Views
-"""
 
 
 class WorkOrderListView(MisOrderListView):
@@ -41,6 +45,15 @@ class WorkOrderListView(MisOrderListView):
         kwargs['date_list'] = date_list
         kwargs['departments'] = Department.objects.all()
         return super().get_context_data(**kwargs)
+"""
+
+
+class WorkOrderListView(APIView):
+
+    def get(self, request, format=None):
+        work_order_log = WorkOrderLog.objects.filter(record_type='create')
+        serializer = WorkOrderLogSerializer(work_order_log[0: 10], many=True)
+        return Response(serializer.data)
 
 
 class WorkOrderCreateView(MisCreateView):
