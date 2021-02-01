@@ -1,0 +1,2 @@
+在 settings.py 中 INSTALLED_APPS 添加 rest_framework
+
