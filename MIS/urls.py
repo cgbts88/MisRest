@@ -13,6 +13,8 @@ urlpatterns = [
 	path('worktable/', include(('worktable.urls', 'worktable'), namespace='worktable')),
 	path('personnel/', include(('users.urls', 'personnel'), namespace='personnel')),
 	path('asset/', include(('asset.urls', 'asset'), namespace='asset')),
+
+	path('api-auth/', include('rest_framework.urls'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

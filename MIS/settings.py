@@ -57,7 +57,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'apps.utils.middleware.MenuCollection',
     'apps.utils.middleware.ActionMiddleware',
-    'apps.utils.middleware.RbacMiddleware',
+    # 'apps.utils.middleware.RbacMiddleware',
 ]
 
 ROOT_URLCONF = 'MIS.urls'

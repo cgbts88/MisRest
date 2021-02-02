@@ -3,9 +3,11 @@ from dateutil.relativedelta import relativedelta
 from json import dumps as json_dumps
 
 from rest_framework import status
-from rest_framework.views import APIView
+from rest_framework import generics
 from rest_framework.response import Response
+from rest_framework import permissions
 from .serializers import WorkOrderLogSerializer, WorkOrderSerializer
+from .permissions import IsOwnerOrReadOnly
 
 from django.contrib.auth import get_user_model
 from django.db.models import Q
@@ -48,19 +50,19 @@ class WorkOrderListView(MisOrderListView):
 """
 
 
-class WorkOrderListView(APIView):
+class WorkOrderListView(generics.ListCreateAPIView):
+    queryset = WorkOrder.objects.all()[0:10]
+    serializer_class = WorkOrderSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
-    def get(self, request, format=None):
-        work_order_log = WorkOrderLog.objects.filter(record_type='create')
-        serializer = WorkOrderLogSerializer(work_order_log[0: 10], many=True)
-        return Response(serializer.data)
+    def perform_create(self, serializer):
+        serializer.save(proposer=self.request.user)
 
-    def post(self, request, format=None):
-        serializer = WorkOrderLogSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class WorkOrderDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = WorkOrder.objects.all()
+    serializer_class = WorkOrderSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
 
 
 class WorkOrderCreateView(MisCreateView):
@@ -119,43 +121,6 @@ class WorkOrderInsteadView(MisCreateView):
 class WorkOrderDeleteView(MisDeleteView):
     model = WorkOrder
     success_url = 'worktable/order'
-
-
-class WorkOrderDetailView(MisUpdateView):
-    model = WorkOrder
-    form_class = OrderForm
-    template_name = 'worktable/order/detail.html'
-
-    def get_context_data(self, **kwargs):
-        parameter = {
-            'form_type': "A",
-            'current_user': self.request.user.id,
-            'order_status': self.object.state,
-            'proposer': self.object.proposer.id,
-            'leader': ''
-        }
-        actions_list = action_menu(**parameter)
-        kwargs['types'] = WorkOrder.TYPES
-        kwargs['records'] = WorkOrderLog.objects.filter(record_obj__num=self.request.GET['num'])
-        kwargs['actions_list'] = actions_list
-        kwargs['parameter'] = parameter
-        kwargs['result'] = 'ban' if not actions_list else ''
-        return super().get_context_data(**kwargs)
-
-    def post(self, request, *args, **kwargs):
-        res = dict(result=False)
-        work_order = self.object()
-        form = self.form_class(data=request.POST, instance=work_order)
-        if form.is_valid():
-            new_form = form.save(commit=False)
-            new_form.proposer = request.user
-            new_form.state = 'wait'
-            new_form.save()
-            order_record(recorder=request.user, num=work_order.num, record_type="update")
-            res['result'] = True
-        else:
-            res = form_invalid_msg(form)
-        return HttpResponse(json_dumps(res), content_type='application/json')
 
 
 class WorkOrderProcessView(LoginRequiredMixin, View):

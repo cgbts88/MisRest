@@ -14,9 +14,9 @@ class WorkOrder(models.Model):
              ('print', '打印问题'), ('transmission', '上传下载'))
 
     num = models.CharField(max_length=32, unique=True, verbose_name='单号')
+    type = models.CharField(max_length=16, choices=TYPES, default='normal', verbose_name='类型')
     content = models.TextField(max_length=512, verbose_name='内容')
     state = models.CharField(max_length=16, blank=True, choices=STATUS, default='wait', verbose_name='状态')
-    type = models.CharField(max_length=16, choices=TYPES, default='normal', verbose_name='类型')
     proposer = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='发起人')
 
     class Meta:
