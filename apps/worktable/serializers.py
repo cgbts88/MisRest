@@ -24,10 +24,12 @@ class WorkOrderLogSerializer(serializers.ModelSerializer):
 
 
 class WorkOrderSerializer(serializers.ModelSerializer):
-    created_log = serializers.SerializerMethodField('get_logs')
+    created_log = serializers.SerializerMethodField('get_created_log')
+    process_log = serializers.SerializerMethodField('get_process_log')
     proposer = serializers.ReadOnlyField(source='proposer.__str__')
+    len_content = serializers.SerializerMethodField('get_len_content')
     state = serializers.ReadOnlyField(source='get_state_display')
-    cn_type = serializers.ReadOnlyField(source='get_type_display')
+    type = serializers.ReadOnlyField(source='get_type_display')
     # workorderlog_set = WorkOrderLogSerializer(many=True)
 
     class Meta:
@@ -39,9 +41,21 @@ class WorkOrderSerializer(serializers.ModelSerializer):
             fields=['num']
         )
 
-    def get_logs(self, obj):
-        log = WorkOrderLog.objects.filter(record_obj=obj, record_type='create')
-        serializer = WorkOrderLogSerializer(log, many=True)
+    def get_len_content(self, obj):
+        content = obj.content
+        if len(str(content)) > 16:
+            return '{}...'.format(str(content)[0:16])
+        else:
+            return str(content)
+
+    def get_created_log(self, obj):
+        log = WorkOrderLog.objects.get(record_obj=obj, record_type='create')
+        serializer = WorkOrderLogSerializer(log)
+        return serializer.data
+
+    def get_process_log(self, obj):
+        log = WorkOrderLog.objects.get(record_obj=obj, record_type='process')
+        serializer = WorkOrderLogSerializer(log)
         return serializer.data
 
     """

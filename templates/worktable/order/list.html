@@ -15,7 +15,7 @@
                 </li>
                 <li class="form-group searchArea margin-r-5 margin-top-5">
                   <label>　　姓名：</label>
-                  <input class="form-group" name="username" type="text" value="" placeholder="例如：zhangsan"/>
+                  <input class="form-group" name="search" type="text" value="" placeholder="例如：zhangsan"/>
                 </li>
                   <label>　　月份：</label>
                   <select class="form-group searchArea margin-r-5 margin-top-5" name="date">
@@ -51,8 +51,7 @@
                         <th>操作</th>
                 </tr>
             </thead>
-
-{% if not data_all %}
+{% if not results %}
          <tbody>
                 <tr>
                     <th></th>
@@ -61,23 +60,23 @@
         </tbody>
 {% else %}
         <tbody>
-            {% for item in data_all %}
+            {% for item in results %}
                 {% if forloop.counter|divisibleby:'2' %}
                 <tr bgcolor="WhiteSmoke">{% else %}<tr>{% endif %}
                     <th><input type="checkbox" name="checkList" value="{{ item.id }}"></th>
                     <th>{{ item.num }}</th>
-                    <th>{{ item.propose_time|date:"Y-m-d H:i" }}</th>
+                    <th>{{ item.created_log.record_time }}</th>
                     <th>{{ item.proposer }}</th>
-                    <th>{{ item.content }}</th>
-                    <th>{{ item.processor }}</th>
-                    <th>{{ item.process_time|date:"Y-m-d H:i" }}</th>
+                    <th>{{ item.len_content }}</th>
+                    <th>{{ item.process_log.recorder }}</th>
+                    <th>{{ item.process_log.record_time }}</th>
                     <th>{{ item.type }}</th>
                     <th>{{ item.state }}</th>
                     <th>
                         {% if 'detail' in request.action_list %}
-                            <button title='详情' onclick='doDetail("{{ item.num }}")'>详情</button>
+                            <button title='详情' onclick='doDetail("{{ item.id }}")'>详情</button>
                         {% else %}
-                            <button title='详情' onclick='doDetail("{{ item.num }}")' disabled="disabled">详情</button>
+                            <button title='详情' onclick='doDetail("{{ item.id }}")' disabled="disabled">详情</button>
                         {% endif %}
                     </th>
                 </tr>
@@ -106,7 +105,7 @@
 
     //跳转到详情
      function doDetail(num) {
-        window.location.href = ["{% url 'worktable:order-detail' %}" + '?num=' + num];
+        window.location.href = ["{% url 'worktable:order-detail' %}" + num];
     }
 
 	//批量删除
