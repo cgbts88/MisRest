@@ -45,7 +45,7 @@ class WorkOrderLog(models.Model):
     TYPES = (('create', '创建'), ('update', '修改'), ('process', '处理'), ('finish', '完成'), ('confirm', '确认'))
 
     record_obj = models.ForeignKey("WorkOrder", verbose_name='单号', on_delete=models.CASCADE)
-    recorder = models.ForeignKey(User, related_name='workorder_recorder', verbose_name='记录人', on_delete=models.CASCADE)
+    recorder = models.ForeignKey(User, verbose_name='记录人', on_delete=models.CASCADE)
     record_type = models.CharField(max_length=16, choices=TYPES, verbose_name='记录类型')
     record_time = models.DateTimeField(auto_now_add=True, verbose_name='记录时间')
     remark = models.TextField(default="", verbose_name="备注")

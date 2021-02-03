@@ -1,9 +1,15 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from json import dumps as json_dumps
+from time import time
+from datetime import datetime
+
+from functools import wraps
+from loguru import logger
 
 from rest_framework import status
 from rest_framework import generics
+from rest_framework import filters
 from rest_framework.response import Response
 from rest_framework import permissions
 from .serializers import WorkOrderLogSerializer, WorkOrderSerializer
@@ -51,9 +57,13 @@ class WorkOrderListView(MisOrderListView):
 
 
 class WorkOrderListView(generics.ListCreateAPIView):
-    queryset = WorkOrder.objects.all()[0:10]
+    queryset = WorkOrder.objects.all()
     serializer_class = WorkOrderSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    filter_backends = (filters.SearchFilter, filters.OrderingFilter)
+    search_fields = ('proposer__username', 'proposer__department__simple_title')
+    ordering_fields = ('id',)
 
     def perform_create(self, serializer):
         serializer.save(proposer=self.request.user)
