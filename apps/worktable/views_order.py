@@ -1,13 +1,11 @@
-from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from json import dumps as json_dumps
-from time import time
 from datetime import datetime
 
-from rest_framework import status
 from rest_framework import generics, renderers, filters, permissions
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
-from .serializers import WorkOrderLogSerializer, WorkOrderSerializer
+from .serializers import WorkOrderSerializer
 from .permissions import IsOwnerOrReadOnly
 
 from django.contrib.auth import get_user_model
@@ -18,9 +16,9 @@ from .models import WorkOrder, WorkOrderLog
 from .forms import OrderForm, InsteadForm
 from users.models import Department
 
-from utils.custom import MisCreateView, MisDeleteView, MisOrderListView, MisUpdateView
+from utils.custom import MisCreateView, MisDeleteView
 from utils.mixin import LoginRequiredMixin
-from utils.toolkit import build_order_num, order_record, action_menu
+from utils.toolkit import build_order_num, order_record
 from utils.mailer import send_work_order_message
 from utils.util import form_invalid_msg
 
@@ -29,30 +27,11 @@ User = get_user_model()
 
 """
 Here is WorkOrder Views
-
-
-class WorkOrderListView(MisOrderListView):
-    model = WorkOrderLog
-    context_object_name = 'data_all'
-    template_name = 'worktable/order/list.html'
-    paginate_by = 20
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        work_order_log = WorkOrderLog.objects.filter(record_type='create').values('record_time').first()
-        date_start = datetime.now()
-        date_end = work_order_log['record_time']
-        date_list = []
-        while date_start > date_end:
-            date_list.append(str(date_start.year) + '-' + str(date_start.month).zfill(2))
-            date_start -= relativedelta(months=1)
-        kwargs['date_list'] = date_list
-        kwargs['departments'] = Department.objects.all()
-        return super().get_context_data(**kwargs)
 """
 
 
-class WorkOrderListView(generics.ListAPIView):
-    queryset = WorkOrder.objects.all()
+class WorkOrderListView(ModelViewSet):
+    queryset = WorkOrder.objects.all().order_by("-id")
     serializer_class = WorkOrderSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
@@ -62,6 +41,25 @@ class WorkOrderListView(generics.ListAPIView):
 
     renderer_classes = (renderers.TemplateHTMLRenderer, renderers.JSONRenderer)
     template_name = 'worktable/order/list.html'
+
+    def list(self, request, *args, **kwargs):
+        work_order_log = WorkOrderLog.objects.filter(record_type='create').values('record_time').first()
+        date_start = datetime.now()
+        date_end = work_order_log['record_time']
+        date_list = []
+        while date_start > date_end:
+            date_list.append(str(date_start.year) + '-' + str(date_start.month).zfill(2))
+            date_start -= relativedelta(months=1)
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            results = {
+                'data': serializer.data,
+                'departments': Department.objects.all(),
+                'date_list': date_list,
+            }
+            return self.get_paginated_response(results)
 
     def perform_create(self, serializer):
         serializer.save(proposer=self.request.user)

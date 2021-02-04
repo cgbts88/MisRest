@@ -49,14 +49,20 @@ class WorkOrderSerializer(serializers.ModelSerializer):
             return str(content)
 
     def get_created_log(self, obj):
-        log = WorkOrderLog.objects.get(record_obj=obj, record_type='create')
-        serializer = WorkOrderLogSerializer(log)
-        return serializer.data
+        try:
+            log = WorkOrderLog.objects.get(record_obj=obj, record_type='create')
+            serializer = WorkOrderLogSerializer(log)
+            return serializer.data
+        except Exception as e:
+            return None
 
     def get_process_log(self, obj):
-        log = WorkOrderLog.objects.get(record_obj=obj, record_type='process')
-        serializer = WorkOrderLogSerializer(log)
-        return serializer.data
+        try:
+            log = WorkOrderLog.objects.get(record_obj=obj, record_type='process')
+            serializer = WorkOrderLogSerializer(log)
+            return serializer.data
+        except Exception as e:
+            return None
 
     """
     def create(self, validated_data):

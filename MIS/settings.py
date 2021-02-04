@@ -167,5 +167,5 @@ EMAIL_HOST_PASSWORD = 'Ewig@2020'         # 發送郵件的郵箱密碼
 REST_FRAMEWORK = {
     'DATETIME_FORMAT': "%Y-%m-%d %H:%M",
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10,
+    'PAGE_SIZE': 20,
 }
