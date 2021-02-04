@@ -9,7 +9,7 @@
                   <select class="inputText select2" name="department" id="department">
                     <option value="">-- ALL --</option>
                     {% for department in results.departments %}
-                    <option value='{{ department.simple_title }}'>{{ department.simple_title }}</option>
+                    <option value='{{ department.id }}'>{{ department.simple_title }}</option>
                     {% endfor %}
                   </select>
                 </li>

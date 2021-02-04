@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class AssetConfig(AppConfig):
-	name = 'worktable'
+class WorkTableConfig(AppConfig):
+	name = 'apps.worktable'

@@ -6,14 +6,14 @@ from django.views.generic import View
 from django.shortcuts import HttpResponse, get_object_or_404
 from django.urls import reverse_lazy
 
-from .models import Attribute, Stock, RecordLog
-from .forms import StockForm
-from users.models import Department
+from apps.asset.models import Attribute, Stock, RecordLog
+from apps.asset.forms import StockForm
+from apps.users.models import Department
 
-from utils.custom import MisCreateView, MisUpdateView, MisDeleteView, MisListView, MisRelationView
-from utils.mixin import LoginRequiredMixin
-from utils.toolkit import form_to_remark, output_to_records
-from utils.util import form_invalid_msg
+from apps.utils.custom import MisCreateView, MisUpdateView, MisDeleteView, MisListView, MisRelationView
+from apps.utils.mixin import LoginRequiredMixin
+from apps.utils.toolkit import form_to_remark, output_to_records
+from apps.utils.util import form_invalid_msg
 
 User = get_user_model()
 

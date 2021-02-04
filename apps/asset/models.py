@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
-from users.models import Department
+from apps.users.models import Department
 
 User = get_user_model()
 

@@ -5,14 +5,14 @@ from django.db.models import Q
 from django.contrib.auth import get_user_model
 from django.shortcuts import HttpResponse
 
-from .models import Stock, NetworkDevice, OtherDevice, AssetOrder, RecordLog
-from .forms import NetworkDeviceForm, OtherDeviceForm
-from users.models import Department
+from apps.asset.models import Stock, NetworkDevice, OtherDevice, AssetOrder, RecordLog
+from apps.asset.forms import NetworkDeviceForm, OtherDeviceForm
+from apps.users.models import Department
 
-from utils.custom import MisCreateView, MisUpdateView, MisDeleteView, MisRelationView, MisListView
-from utils.toolkit import build_order_num
-from utils.mailer import send_asset_order_message
-from utils.util import form_invalid_msg
+from apps.utils.custom import MisCreateView, MisUpdateView, MisDeleteView, MisRelationView, MisListView
+from apps.utils.toolkit import build_order_num
+from apps.utils.mailer import send_asset_order_message
+from apps.utils.util import form_invalid_msg
 
 User = get_user_model()
 

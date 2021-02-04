@@ -1,9 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.views.generic import TemplateView, ListView
 
-from utils.custom import BreadcrumbMixin, MisCreateView, MisUpdateView, MisDeleteView, MisRelationView
-from utils.mixin import LoginRequiredMixin
-from .models import TypeCode, Attribute
+from apps.utils.custom import BreadcrumbMixin, MisCreateView, MisUpdateView, MisDeleteView, MisRelationView
+from apps.utils.mixin import LoginRequiredMixin
+from apps.asset.models import TypeCode, Attribute
 
 User = get_user_model()
 

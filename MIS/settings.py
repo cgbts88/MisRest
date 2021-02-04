@@ -10,12 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
-import os
-import sys
+from os import path as os_path
+from sys import path as sys_path
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
+BASE_DIR = os_path.dirname(os_path.dirname(os_path.abspath(__file__)))
+sys_path.insert(0, os_path.join(BASE_DIR, 'apps'))
 
 
 # Quick-start development settings - unsuitable for production
@@ -41,10 +41,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'system',
-    'users',
-    'asset',
-    'worktable',
+    'apps.system.apps.SystemConfig',
+    'apps.users.apps.UsersConfig',
+    'apps.asset.apps.AssetConfig',
+    'apps.worktable.apps.WorkTableConfig',
 ]
 
 MIDDLEWARE = [
@@ -66,7 +66,7 @@ ROOT_URLCONF = 'MIS.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [os_path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -136,12 +136,12 @@ USE_TZ = False
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATICFILES_DIRS = [os_path.join(BASE_DIR, 'static')]
 
 
 MEDIA_URL = '/media/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os_path.join(BASE_DIR, 'media')
 
 LOGIN_URL = '/login/'
 
@@ -166,6 +166,7 @@ EMAIL_HOST_PASSWORD = 'Ewig@2020'         # 發送郵件的郵箱密碼
 
 REST_FRAMEWORK = {
     'DATETIME_FORMAT': "%Y-%m-%d %H:%M",
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_PAGINATION_CLASS': 'apps.utils.pagination.CommonPagination',
     'PAGE_SIZE': 20,
 }

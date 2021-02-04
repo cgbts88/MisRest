@@ -1,9 +1,9 @@
 from datetime import date
 from django.contrib.auth import get_user_model
 
-from asset.models import Stock, RecordLog, Attribute, AssetOrder
-from users.models import Department
-from worktable.models import WorkOrder, WorkOrderLog
+from apps.asset.models import Stock, RecordLog, Attribute, AssetOrder
+from apps.users.models import Department
+from apps.worktable.models import WorkOrder, WorkOrderLog
 
 User = get_user_model()
 

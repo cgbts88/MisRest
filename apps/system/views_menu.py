@@ -1,8 +1,8 @@
 from django.views.generic import ListView
 
-from .models import Menu
-from utils.custom import MisCreateView, MisUpdateView, MisDeleteView
-from utils.mixin import LoginRequiredMixin
+from apps.system.models import Menu
+from apps.utils.custom import MisCreateView, MisUpdateView, MisDeleteView
+from apps.utils.mixin import LoginRequiredMixin
 
 
 class MenuListView(LoginRequiredMixin, ListView):

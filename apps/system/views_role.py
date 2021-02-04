@@ -4,10 +4,10 @@ from django.contrib.auth import get_user_model
 from django.views.generic import View, ListView
 from django.shortcuts import HttpResponse, get_object_or_404, render
 
-from .models import Role, Menu
-from users.models import Department
-from utils.custom import BreadcrumbMixin, MisCreateView, MisUpdateView, MisDeleteView
-from utils.mixin import LoginRequiredMixin
+from apps.system.models import Role, Menu
+from apps.users.models import Department
+from apps.utils.custom import BreadcrumbMixin, MisCreateView, MisUpdateView, MisDeleteView
+from apps.utils.mixin import LoginRequiredMixin
 
 User = get_user_model()
 

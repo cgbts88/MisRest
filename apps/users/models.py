@@ -61,7 +61,7 @@ class Department(models.Model):
         verbose_name_plural = verbose_name
         ordering = ['sort_number']
 
-    def __str__(self):
+    def __repr__(self):
         return str('%s') % self.simple_title
 
 

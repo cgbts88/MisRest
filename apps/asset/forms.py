@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 from django import forms
-from .models import TypeCode, Attribute, Stock, NetworkDevice, OtherDevice
+from apps.asset.models import TypeCode, Attribute, Stock, NetworkDevice, OtherDevice
 
 
 class TypeCodeForm(forms.ModelForm):

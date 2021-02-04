@@ -8,8 +8,8 @@ from django.http import Http404, JsonResponse
 from django.db.models.query import QuerySet
 from django.core.exceptions import ImproperlyConfigured
 
-from system.models import Menu
-from utils.mixin import LoginRequiredMixin
+from apps.system.models import Menu
+from apps.utils.mixin import LoginRequiredMixin
 
 
 class BreadcrumbMixin:

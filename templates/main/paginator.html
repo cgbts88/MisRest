@@ -13,27 +13,21 @@
       </a>
     </li>
   {% endif %}
+
+  {% for num in page_range %}
+    {% if num == current %}
     <li class="disabled">
-      <a href="#" aria-label="current">
-        <span aria-hidden="true">{{ current_page }}1</span>
+      <a href="#">
+        <span aria-hidden="true">{{ num }}</span>
       </a>
     </li>
-  {% for page_link in page_links %}
-    {% if page_link.is_break %}
-      <li class="disabled">
-        <a href="#"><span aria-hidden="true">&hellip;</span></a>
-      </li>
-    {% else %}
-      {% if page_link.is_active %}
-        <li class="active">
-          <a href="{{ page_link.url }}">{{ page_link.number }}</a>
-        </li>
-      {% else %}
-        <li>
-          <a href="{{ page_link.url }}">{{ page_link.number }}</a>
-        </li>
-      {% endif %}
-    {% endif %}
+  {% else %}
+    <li>
+      <a href="?page={{ num }}">
+        <span aria-hidden="true">{{ num }}</span>
+      </a>
+    </li>
+  {% endif %}
   {% endfor %}
 
   {% if next %}

@@ -1,8 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 
-from .models import Department, Location, Position
-from utils.custom import MisCreateView, MisUpdateView, MisDeleteView, MisRelationView, MisListView
+from apps.users.models import Department, Location, Position
+from apps.utils.custom import MisCreateView, MisUpdateView, MisDeleteView, MisRelationView, MisListView
 
 User = get_user_model()
 

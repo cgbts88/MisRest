@@ -2,7 +2,7 @@
 
 from django.urls import path
 
-from asset import views_base, views_stock, views_info
+from apps.asset import views_base, views_stock, views_info
 
 
 urlpatterns = [

@@ -5,13 +5,13 @@ from django.shortcuts import HttpResponse, get_object_or_404
 from django.views.generic.base import TemplateView
 from django.contrib.auth.hashers import make_password
 from django.views.generic import View
-from .models import Department, Location, Position, Permit, PermitLog
-from .forms import UserUpdateForm, PermitForm
-from system.models import Role
+from apps.users.models import Department, Location, Position, Permit, PermitLog
+from apps.users.forms import UserUpdateForm, PermitForm
+from apps.system.models import Role
 
-from utils.custom import MisCreateView, MisUpdateView, MisDeleteView, MisListView, MisRelationView
-from utils.util import format_user_name, form_invalid_msg
-from utils.mixin import LoginRequiredMixin
+from apps.utils.custom import MisCreateView, MisUpdateView, MisDeleteView, MisListView, MisRelationView
+from apps.utils.util import format_user_name, form_invalid_msg
+from apps.utils.mixin import LoginRequiredMixin
 
 User = get_user_model()
 

@@ -13,15 +13,15 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views.generic.base import View, TemplateView
 
-from .models import FileUpload
-from .forms import UploadForm
-from asset.models import NetworkDevice
-from users.models import PermitLog
-from users.forms import LoginForm
-from worktable.models import WorkOrderLog
+from apps.system.models import FileUpload
+from apps.system.forms import UploadForm
+from apps.asset.models import NetworkDevice
+from apps.users.models import PermitLog
+from apps.users.forms import LoginForm
+from apps.worktable.models import WorkOrderLog
 
-from utils.mixin import LoginRequiredMixin
-from utils.mailer import send_daily_job_excel
+from apps.utils.mixin import LoginRequiredMixin
+from apps.utils.mailer import send_daily_job_excel
 
 User = get_user_model()
 

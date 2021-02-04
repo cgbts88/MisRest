@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 from django import forms
-from .models import Menu, EmailSetup, FileUpload
+from apps.system.models import Menu, EmailSetup, FileUpload
 
 
 class MenuForm(forms.ModelForm):

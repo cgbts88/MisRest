@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 
-from utils.util import FileStorage
+from apps.utils.util import FileStorage
 
 
 class Menu(models.Model):

@@ -2,7 +2,7 @@
 
 from django import forms
 from django.contrib.auth import get_user_model
-from .models import Permit
+from apps.users.models import Permit
 
 User = get_user_model()
 

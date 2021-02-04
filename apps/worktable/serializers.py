@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import WorkOrder, WorkOrderLog
+from apps.worktable.models import WorkOrder, WorkOrderLog
 
 
 class WorkOrderLogSerializer(serializers.ModelSerializer):

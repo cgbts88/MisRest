@@ -3,7 +3,7 @@ import datetime
 
 from django.conf import settings
 
-from worktable.models import WorkOrderLog
+from apps.worktable.models import WorkOrderLog
 
 
 def get_data(date):

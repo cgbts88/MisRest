@@ -8,13 +8,13 @@ from django.views.generic.base import TemplateView
 from django.views.generic import View
 from django.http import HttpResponse
 
-from users.models import UserProfile, Department, Location, Position
-from users.forms import UserCenterForm, SelfPasswordChangeForm
-from asset.models import NetworkDevice
+from apps.users.models import UserProfile, Department, Location, Position
+from apps.users.forms import UserCenterForm, SelfPasswordChangeForm
+from apps.asset.models import NetworkDevice
 
-from utils.custom import MisUpdateView, MisListView
-from utils.mixin import LoginRequiredMixin
-from utils.util import form_invalid_msg
+from apps.utils.custom import MisUpdateView, MisListView
+from apps.utils.mixin import LoginRequiredMixin
+from apps.utils.util import form_invalid_msg
 
 User = get_user_model()
 

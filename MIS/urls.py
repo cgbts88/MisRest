@@ -1,5 +1,5 @@
 from django.urls import path, include
-from system.views_index import IndexView, LoginView, LogoutView
+from apps.system.views_index import IndexView, LoginView, LogoutView
 from django.conf import settings
 from django.conf.urls.static import static
 

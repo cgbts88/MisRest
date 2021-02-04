@@ -13,9 +13,9 @@ from email.utils import parseaddr, formataddr
 from email.mime.multipart import MIMEMultipart
 from email.header import Header
 
-from asset.models import NetworkDevice, AssetOrder, Stock
-from users.models import Department
-from worktable.models import WorkOrder, WorkOrderLog
+from apps.asset.models import NetworkDevice, AssetOrder, Stock
+from apps.users.models import Department
+from apps.worktable.models import WorkOrder, WorkOrderLog
 
 from utils.export import get_excel
 

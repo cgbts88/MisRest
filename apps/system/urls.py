@@ -1,6 +1,6 @@
 from django.urls import path
 
-from system import views_index, views_menu, views_role
+from apps.system import views_index, views_menu, views_role
 
 urlpatterns = [
 
