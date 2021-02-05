@@ -3,22 +3,23 @@
 {% block content %}
 <!-- Main content -->
         <form class="form-inline" id="queryForm">
+            <input name="page" type="hidden" value="1"/>
             <ul>
                 <li class="form-group searchArea margin-r-5 margin-top-5">
                   <label>部门：</label>
-                  <select class="inputText select2" name="department" id="department">
+                  <select class="inputText select2" name="d" id="department">
                     <option value="">-- ALL --</option>
                     {% for department in results.departments %}
-                    <option value='{{ department.id }}'>{{ department.simple_title }}</option>
+                    <option value='{{ department.simple_title }}'>{{ department.simple_title }}</option>
                     {% endfor %}
                   </select>
                 </li>
                 <li class="form-group searchArea margin-r-5 margin-top-5">
                   <label>　　姓名：</label>
-                  <input class="form-group" name="search" type="text" value="" placeholder="例如：zhangsan"/>
+                  <input class="form-group" name="u" type="text" value="" placeholder="例如：zhangsan"/>
                 </li>
                   <label>　　月份：</label>
-                  <select class="form-group searchArea margin-r-5 margin-top-5" name="date">
+                  <select class="form-group searchArea margin-r-5 margin-top-5" name="t">
                         <option value="">-- ALL --</option>
                         {% for item in results.date_list %}
                             <option value="{{ item }}">{{ item }}</option>

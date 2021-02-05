@@ -1,34 +1,41 @@
 <center>
 <ul class="pagination" style="margin: 5px 0 10px 0">
   {% if previous %}
-    <li>
-      <a href="{{ previous }}" aria-label="Previous">
-        <span aria-hidden="true">&laquo;</span>
-      </a>
-    </li>
+    <li><a href="{{ previous }}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
   {% else %}
-    <li class="disabled">
-      <a href="#" aria-label="Previous">
-        <span aria-hidden="true">&laquo;</span>
-      </a>
-    </li>
+    <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
   {% endif %}
 
-  {% for num in page_range %}
-    {% if num == current %}
-    <li class="disabled">
-      <a href="#">
-        <span aria-hidden="true">{{ num }}</span>
-      </a>
-    </li>
+  {% if left_has_more %}
+    <li><a href="?page=1"><span aria-hidden="true">1</span></a></li>
+    <li><a href="#"><span aria-hidden="true">...</span></a></li>
+  {% endif %}
+
+  {# 左边的页码 #}
+  {% for left_page in left_pages %}
+  {% if q %}
+    <li><a href="?page={{ left_page }}&{{ q }}"><span aria-hidden="true">{{ left_page }}</span></a></li>
   {% else %}
-    <li>
-      <a href="?page={{ num }}">
-        <span aria-hidden="true">{{ num }}</span>
-      </a>
-    </li>
+    <li><a href="?page={{ left_page }}"><span aria-hidden="true">{{ left_page }}</span></a></li>
   {% endif %}
   {% endfor %}
+
+  {# 中间的页码 #}
+  <li class="disabled"><a href="#"><span aria-hidden="true">{{ cur_page }}</span></a></li>
+
+  {# 右边的页码 #}
+  {% for right_page in right_pages %}
+  {% if q %}
+    <li><a href="?page={{ right_page }}&{{ q }}"><span aria-hidden="true">{{ right_page }}</span></a></li>
+  {% else %}
+    <li><a href="?page={{ right_page }}"><span aria-hidden="true">{{ right_page }}</span></a></li>
+  {% endif %}
+  {% endfor %}
+
+  {% if right_has_more %}
+    <li><a href="#"><span aria-hidden="true">...</span></a></li>
+    <li><a href="?page={{ total_page }}"><span aria-hidden="true">{{ total_page }}</span></a></li>
+  {% endif %}
 
   {% if next %}
     <li>

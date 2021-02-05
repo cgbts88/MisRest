@@ -8,18 +8,32 @@ class CommonPagination(PageNumberPagination):
     page_size = 20
 
     def get_paginated_response(self, data):
-        page_num = ceil(self.page.paginator.count/self.page_size)
+        filters = "&".join([item[0] + '=' + item[1] for item in self.request.GET.items() if item[0] != 'page'])
+        around_count = 2
+        left_has_more = False
+        right_has_more = False
+        total_page = ceil(self.page.paginator.count/self.page_size)
         cur_page = self.page.number
-        if cur_page - 5 < 1:
-            page_range = range(1, 10)
-        elif cur_page + 5 > page_num:
-            page_range = range(cur_page-5, page_num+1)
+        if cur_page <= around_count + 2:
+            left_page = range(1, cur_page)
         else:
-            page_range = range(cur_page-5, cur_page+5)
+            left_has_more = True
+            left_page = range(cur_page - around_count, cur_page)
+        if cur_page >= total_page - around_count - 1:
+            right_page = range(cur_page + 1, total_page + 1)
+        else:
+            right_has_more = True
+            right_page = range(cur_page + 1, cur_page + 3)
+
         return Response(OrderedDict([
-            ('current', cur_page),
+            ('q', filters),
+            ('left_pages', left_page),
+            ('right_pages', right_page),
+            ('cur_page', cur_page),
+            ('left_has_more', left_has_more),
+            ('right_has_more', right_has_more),
+            ('total_page', total_page),
             ('next', self.get_next_link()),
             ('previous', self.get_previous_link()),
-            ('page_range', page_range),
             ('results', data)
         ]))

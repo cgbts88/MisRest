@@ -1,5 +1,5 @@
-from dateutil.relativedelta import relativedelta
 from json import dumps as json_dumps
+from dateutil.relativedelta import relativedelta
 from datetime import datetime
 
 from django.contrib.auth import get_user_model
@@ -7,23 +7,25 @@ from django.db.models import Q
 from django.shortcuts import HttpResponse, get_object_or_404
 from django.views.generic.base import View
 
-from rest_framework import generics, renderers, filters, permissions
+from rest_framework import generics, renderers, permissions
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.response import Response
-
-from apps.worktable.serializers import WorkOrderSerializer
-from apps.worktable.permissions import IsOwnerOrReadOnly
-from apps.users.serializers import DepartmentSerializer
-
-from apps.worktable.models import WorkOrder, WorkOrderLog
-from apps.worktable.forms import OrderForm, InsteadForm
-from apps.users.models import Department
+from django_filters import rest_framework
 
 from apps.utils.custom import MisCreateView, MisDeleteView
 from apps.utils.mixin import LoginRequiredMixin
 from apps.utils.toolkit import build_order_num, order_record
 from apps.utils.mailer import send_work_order_message
 from apps.utils.util import form_invalid_msg
+
+from apps.worktable.models import WorkOrder, WorkOrderLog
+from apps.users.models import Department
+
+from apps.worktable.serializers import WorkOrderSerializer
+from apps.users.serializers import DepartmentSerializer
+
+from apps.worktable.permissions import IsOwnerOrReadOnly
+from apps.worktable.filters import WorkOrderFilter
+from apps.worktable.forms import OrderForm, InsteadForm
 
 User = get_user_model()
 
@@ -38,12 +40,21 @@ class WorkOrderListView(ModelViewSet):
     serializer_class = WorkOrderSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
-    filter_backends = (filters.SearchFilter, filters.OrderingFilter)
-    search_fields = ('proposer__username', 'proposer__department__simple_title')
-    ordering_fields = ('id',)
-
+    filter_class = WorkOrderFilter
     renderer_classes = (renderers.TemplateHTMLRenderer, renderers.JSONRenderer)
     template_name = 'worktable/order/list.html'
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if 't' in self.request.GET and self.request.GET['t']:
+            date = datetime.strptime(self.request.GET['t'], "%Y-%m")
+            logs = WorkOrderLog.objects.filter(
+                record_time__year=date.year,
+                record_time__month=date.month
+            ).values('record_obj').distinct()
+            obj_id_list = [oid['record_obj'] for oid in logs]
+            qs = qs.filter(id__in=obj_id_list)
+        return qs
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
