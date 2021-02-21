@@ -9,7 +9,6 @@ from django.views.generic.base import View
 
 from rest_framework import generics, renderers, permissions
 from rest_framework.viewsets import ModelViewSet
-from django_filters import rest_framework
 
 from apps.utils.custom import MisCreateView, MisDeleteView
 from apps.utils.mixin import LoginRequiredMixin

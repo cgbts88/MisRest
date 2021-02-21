@@ -10,19 +10,31 @@
                   <select class="inputText select2" name="d" id="department">
                     <option value="">-- ALL --</option>
                     {% for department in results.departments %}
+                    {% if department.simple_title == request.GET.d %}
+                    <option value='{{ department.simple_title }}' selected>{{ department.simple_title }}</option>
+                    {% else %}
                     <option value='{{ department.simple_title }}'>{{ department.simple_title }}</option>
+                    {% endif %}
                     {% endfor %}
                   </select>
                 </li>
                 <li class="form-group searchArea margin-r-5 margin-top-5">
                   <label>　　姓名：</label>
+                    {% if request.GET.u %}
+                  <input class="form-group" name="u" type="text" value="{{ request.GET.u }}" placeholder="例如：zhangsan"/>
+                    {% else %}
                   <input class="form-group" name="u" type="text" value="" placeholder="例如：zhangsan"/>
+                    {% endif %}
                 </li>
                   <label>　　月份：</label>
                   <select class="form-group searchArea margin-r-5 margin-top-5" name="t">
                         <option value="">-- ALL --</option>
                         {% for item in results.date_list %}
+                        {% if item == request.GET.t %}
+                            <option value="{{ item }}" selected>{{ item }}</option>
+                        {% else %}
                             <option value="{{ item }}">{{ item }}</option>
+                        {% endif %}
                         {% endfor %}
                     </select>
                 </li>
@@ -87,8 +99,8 @@
         </table>
     </div>
 </section>
-{% endif %}
 {% include 'main/paginator.html' %}
+{% endif %}
 {% endblock %}
 <script src="{% static 'plugins/jQuery/jquery-2.2.3.min.js' %}"></script>
 <script src="{% static 'js/plugins/layer/layer.js' %}"></script>

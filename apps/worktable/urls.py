@@ -1,5 +1,5 @@
 from django.urls import path, re_path
-# from rest_framework.urlpatterns import format_suffix_patterns
+from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework import routers
 
 from apps.worktable import views, views_order
@@ -17,7 +17,7 @@ urlpatterns = [
     path('order/create/', views_order.WorkOrderCreateView.as_view(), name='order-create'),
     path('order/instead/', views_order.WorkOrderInsteadView.as_view(), name='order-instead'),
     path('order/delete/', views_order.WorkOrderDeleteView.as_view(), name='order-delete'),
-    # re_path(r'^order/detail/(?P<pk>[0-9]+)$', views_order.WorkOrderDetailView.as_view(), name='order-detail'),
+    re_path(r'^order/detail/(?P<pk>[0-9]+)$', views_order.WorkOrderDetailView.as_view(), name='order-detail'),
     path('order/detail/', views_order.WorkOrderDetailView.as_view(), name='order-detail'),
     path('order/process/', views_order.WorkOrderProcessView.as_view(), name='order-process'),
     path('order/finish/', views_order.WorkOrderFinishView.as_view(), name='order-finish'),
@@ -25,4 +25,4 @@ urlpatterns = [
 
 ]
 
-# urlpatterns = format_suffix_patterns(urlpatterns)
+urlpatterns = format_suffix_patterns(urlpatterns)

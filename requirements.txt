@@ -1,10 +1,16 @@
-django==3.1.5
-djangorestframework==3.12.2
-mysqlclient==1.4.2
-pillow=8.0.1
-loguru==0.5.3
-python-dateutil=2.8.1
-xlwings=0.20.8
+asgiref==3.3.1
+colorama==0.4.4
+comtypes==1.1.8
+Django==3.1.6
 django-filter==2.4.0
-xlwings=0.20.8
-python-dateutil=2.8.1
+djangorestframework==3.12.2
+loguru==0.5.3
+mysqlclient @ file:///D:/Python/MisRest/mysqlclient-1.4.2-cp37-cp37m-win32.whl
+Pillow==8.1.0
+python-dateutil==2.8.1
+pytz==2021.1
+pywin32==300
+six==1.15.0
+sqlparse==0.4.1
+win32-setctime==1.0.3
+xlwings==0.20.8
