@@ -87,9 +87,9 @@
                     <th>{{ item.state }}</th>
                     <th>
                         {% if 'detail' in request.action_list %}
-                            <button title='详情' onclick='doDetail("{{ item.id }}")'>详情</button>
+                            <button title='详情' onclick="doDetail('{% url 'worktable:order-detail' item.id %}')">详情</button>
                         {% else %}
-                            <button title='详情' onclick='doDetail("{{ item.id }}")' disabled="disabled">详情</button>
+                            <button title='详情' onclick="doDetail('{% url 'worktable:order-detail' item.id %}')" disabled="disabled">详情</button>
                         {% endif %}
                     </th>
                 </tr>
@@ -118,7 +118,7 @@
 
     //跳转到详情
      function doDetail(num) {
-        window.location.href = ["{% url 'worktable:order-detail' %}" + num];
+        window.location.href = num;
     }
 
 	//批量删除

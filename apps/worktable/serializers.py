@@ -23,7 +23,7 @@ class WorkOrderLogSerializer(serializers.ModelSerializer):
     """
 
 
-class WorkOrderSerializer(serializers.ModelSerializer):
+class WorkOrderListSerializer(serializers.ModelSerializer):
     created_log = serializers.SerializerMethodField('get_created_log')
     process_log = serializers.SerializerMethodField('get_process_log')
     proposer = serializers.ReadOnlyField(source='proposer.__str__')
@@ -81,3 +81,9 @@ class WorkOrderSerializer(serializers.ModelSerializer):
         if data['content'] is None:
             raise serializers.ValidationError("Content is None")
         return data
+
+
+class WorkOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WorkOrder
+        fields = '__all__'

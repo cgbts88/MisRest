@@ -3,7 +3,7 @@
 <div class="box box-danger">
 	<form class="form-horizontal" id="addForm" method="post">
 		{% csrf_token %}
-		<input type="hidden" name='id' value="{{ workorder.id }}" />
+		<input type="hidden" name='id' value="{{ result.id }}" />
 		<div class="box-body">
           <fieldset>
             <legend>
@@ -13,7 +13,7 @@
             <div class="form-group has-feedback">
                 <label class="col-sm-2 control-label">单号</label>
                 <div class="col-sm-3">
-                    <input type="text" name='num' value="{{ workorder.num }}" readonly="readonly"/>
+                    <input type="text" name='num' value="{{ result.num }}" readonly="readonly"/>
                     </div>
             </div>
 
@@ -22,7 +22,7 @@
                 <div class="col-sm-3">
                     <select class="form-control select2" name="type">
                         {% for item in types %}
-                            {% if workorder.type == item.0 %}
+                            {% if result.type == item.0 %}
                                 <option value="{{ item.0 }}" selected>{{ item.1 }}</option>
                             {% else %}
                                 <option value="{{ item.0 }}">{{ item.1 }}</option>
@@ -32,7 +32,7 @@
                     </div>
                 <label class="col-sm-2 control-label">工单内容</label>
                 <div class="col-sm-3">
-                    <textarea rows="3" cols="50" name="content">{{ workorder.content }}</textarea>
+                    <textarea rows="3" cols="50" name="content">{{ result.content }}</textarea>
                 </div>
             </div>
 
@@ -48,10 +48,10 @@
                     <button type="button" id="btn{{ action.en_code }}" >{{ action.cn_code }}</button>
                 {% endif %}
               {% endfor %}
-			</div>
-		</div>
+            </div>
+        </div>
 
-	</form>
+    </form>
 </div>
 
 <div class="box-body">
@@ -61,14 +61,12 @@
         </legend>
 
         <div class="form-group has-feedback">
-            {% for record in records reversed %}
-                <label class="col-sm-2 control-label">记录人：{{ record.recorder }}&nbsp;&nbsp;&nbsp;</label>
-                <label class="col-sm-2 control-label">记录时间：{{ record.record_time }}&nbsp;&nbsp;&nbsp;</label>
-                <label class="col-sm-2 control-label">记录类型：{{ record.get_record_type_display }}</label>
-                <div class="col-sm-3">
-                    {{ record.desc|safe }}
-                </div>
-                <br>
+            {% for log in logs %}
+            <label class="col-sm-2 control-label">记录时间：{{ log.record_time }}&nbsp;&nbsp;&nbsp;</label>
+            <label class="col-sm-2 control-label">记录类型：{{ log.full_record_type }}&nbsp;&nbsp;&nbsp;</label>
+            <label class="col-sm-2 control-label">记录人：{{ log.recorder }}&nbsp;&nbsp;&nbsp;</label>
+            <div class="col-sm-3">{{ log.remark|safe }}</div>
+            <br>
             {% endfor %}
         </div>
 
@@ -85,7 +83,7 @@
             var data = $("#addForm").serialize();
             $.ajax({
                 type: $("#addForm").attr('method'),
-                url: "{% url 'worktable:order-detail' %}",
+                url: "{% url 'worktable:order-detail' result.id %}",
                 data: data,
                 cache: false,
                 success: function (msg) {

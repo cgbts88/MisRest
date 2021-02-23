@@ -55,6 +55,3 @@ class WorkOrderLog(models.Model):
     class Meta:
         verbose_name = '日常工单记录'
         verbose_name_plural = verbose_name
-
-    def __str__(self):
-        return self.record_obj

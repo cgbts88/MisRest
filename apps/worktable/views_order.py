@@ -7,19 +7,22 @@ from django.db.models import Q
 from django.shortcuts import HttpResponse, get_object_or_404
 from django.views.generic.base import View
 
-from rest_framework import generics, renderers, permissions
+from rest_framework import renderers, permissions
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
+from rest_framework.generics import GenericAPIView
+from rest_framework.response import Response
 
 from apps.utils.custom import MisCreateView, MisDeleteView
 from apps.utils.mixin import LoginRequiredMixin
-from apps.utils.toolkit import build_order_num, order_record
+from apps.utils.toolkit import build_order_num, order_record, action_menu
 from apps.utils.mailer import send_work_order_message
 from apps.utils.util import form_invalid_msg
 
 from apps.worktable.models import WorkOrder, WorkOrderLog
 from apps.users.models import Department
 
-from apps.worktable.serializers import WorkOrderSerializer
+from apps.worktable.serializers import WorkOrderListSerializer, WorkOrderSerializer, WorkOrderLogSerializer
 from apps.users.serializers import DepartmentSerializer
 
 from apps.worktable.permissions import IsOwnerOrReadOnly
@@ -34,9 +37,9 @@ Here is WorkOrder Views
 """
 
 
-class WorkOrderListView(ModelViewSet):
+class WorkOrderListView(ListModelMixin, GenericAPIView):
     queryset = WorkOrder.objects.all().order_by("-id")
-    serializer_class = WorkOrderSerializer
+    serializer_class = WorkOrderListSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     filter_class = WorkOrderFilter
@@ -55,7 +58,7 @@ class WorkOrderListView(ModelViewSet):
             qs = qs.filter(id__in=obj_id_list)
         return qs
 
-    def list(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         page = self.paginate_queryset(queryset)
         work_order_log = WorkOrderLog.objects.filter(record_type='create').values('record_time').first()
@@ -79,10 +82,40 @@ class WorkOrderListView(ModelViewSet):
         serializer.save(proposer=self.request.user)
 
 
-class WorkOrderDetailView(generics.RetrieveUpdateDestroyAPIView):
+class WorkOrderDetailView(RetrieveModelMixin, UpdateModelMixin, GenericAPIView):
     queryset = WorkOrder.objects.all()
     serializer_class = WorkOrderSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+
+    renderer_classes = (renderers.TemplateHTMLRenderer, renderers.JSONRenderer)
+    template_name = 'worktable/order/detail.html'
+
+    def get(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        logs = WorkOrderLogSerializer(WorkOrderLog.objects.filter(record_obj=instance.id), many=True)
+        parameter = {
+            'form_type': "A",
+            'current_user': self.request.user.id,
+            'order_status': instance.state,
+            'proposer': instance.proposer.id,
+            'leader': ''
+        }
+        actions_list = action_menu(**parameter)
+        ret = {
+            'result': serializer.data,
+            'types': WorkOrder.TYPES,
+            'logs': logs.data,
+            'actions_list': actions_list,
+        }
+        # print(json_dumps(serializer.data, sort_keys=True, indent=4, separators=(', ', ': ')))
+        return Response(ret)
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+    # def delete(self, request, *args, **kwargs):
+    #    return self.destroy(request, *args, **kwargs)
 
 
 class WorkOrderCreateView(MisCreateView):
