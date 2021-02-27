@@ -9,7 +9,7 @@ from django.views.generic.base import View
 
 from rest_framework import renderers, permissions
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
+from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
@@ -22,7 +22,7 @@ from apps.utils.util import form_invalid_msg
 from apps.worktable.models import WorkOrder, WorkOrderLog
 from apps.users.models import Department
 
-from apps.worktable.serializers import WorkOrderListSerializer, WorkOrderSerializer, WorkOrderLogSerializer
+from apps.worktable.serializers import WorkOrderSerializer, WorkOrderLogSerializer
 from apps.users.serializers import DepartmentSerializer
 
 from apps.worktable.permissions import IsOwnerOrReadOnly
@@ -37,14 +37,14 @@ Here is WorkOrder Views
 """
 
 
-class WorkOrderListView(ListModelMixin, GenericAPIView):
+class WorkOrderView(ModelViewSet):
     queryset = WorkOrder.objects.all().order_by("-id")
-    serializer_class = WorkOrderListSerializer
+    serializer_class = WorkOrderSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     filter_class = WorkOrderFilter
-    renderer_classes = (renderers.TemplateHTMLRenderer, renderers.JSONRenderer)
-    template_name = 'worktable/order/list.html'
+    # renderer_classes = (renderers.TemplateHTMLRenderer, renderers.JSONRenderer)
+    # template_name = 'worktable/order/list.html'
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -58,7 +58,7 @@ class WorkOrderListView(ListModelMixin, GenericAPIView):
             qs = qs.filter(id__in=obj_id_list)
         return qs
 
-    def get(self, request, *args, **kwargs):
+    def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         page = self.paginate_queryset(queryset)
         work_order_log = WorkOrderLog.objects.filter(record_type='create').values('record_time').first()
@@ -95,7 +95,7 @@ class WorkOrderDetailView(RetrieveModelMixin, UpdateModelMixin, GenericAPIView):
         serializer = self.get_serializer(instance)
         logs = WorkOrderLogSerializer(WorkOrderLog.objects.filter(record_obj=instance.id), many=True)
         parameter = {
-            'form_type': "A",
+            'form_type': str(instance.num[0]),
             'current_user': self.request.user.id,
             'order_status': instance.state,
             'proposer': instance.proposer.id,
@@ -112,10 +112,14 @@ class WorkOrderDetailView(RetrieveModelMixin, UpdateModelMixin, GenericAPIView):
         return Response(ret)
 
     def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
+        print("到这")
+        return self.partial_update(request, *args, **kwargs)
 
     # def delete(self, request, *args, **kwargs):
     #    return self.destroy(request, *args, **kwargs)
+
+    def perform_update(self, serializer):
+        pass
 
 
 class WorkOrderCreateView(MisCreateView):
