@@ -4,6 +4,7 @@ from rest_framework.routers import DefaultRouter
 
 from apps.worktable import views, views_order
 
+"""
 router = DefaultRouter()
 router.register(r'order', views_order.WorkOrderView, basename='order')
 urlpatterns = router.urls
@@ -17,7 +18,7 @@ urlpatterns = [
     path('person/passwdchange/', views. PersonPasswordChangeView.as_view(), name='passwdchange'),
 
     # Form_A Router
-    path('order/', work_order_list, name='order-list'),
+    path('order/', views_order.WorkOrderView.as_view({'get': 'list'}), name='order-list'),
     path('order/create/', views_order.WorkOrderCreateView.as_view(), name='order-create'),
     path('order/instead/', views_order.WorkOrderInsteadView.as_view(), name='order-instead'),
     path('order/delete/', views_order.WorkOrderDeleteView.as_view(), name='order-delete'),
@@ -30,4 +31,3 @@ urlpatterns = [
 ]
 
 # urlpatterns = format_suffix_patterns(urlpatterns)
-"""

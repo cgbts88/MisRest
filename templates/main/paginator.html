@@ -6,7 +6,13 @@
     <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
   {% endif %}
 
-
+  {% for page in pages %}
+  {% if page.link is None %}
+    <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">{{ page.num }}</span></a></li>
+  {% else %}
+    <li><a href="{{ page.link }}" aria-label="Previous"><span aria-hidden="true">{{ page.num }}</span></a></li>
+  {% endif %}
+  {% endfor %}
 
   {% if next %}
     <li>
