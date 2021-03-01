@@ -44,8 +44,8 @@ class WorkOrderView(ModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     filter_class = WorkOrderFilter
-    renderer_classes = (renderers.TemplateHTMLRenderer, renderers.JSONRenderer)
-    template_name = 'worktable/order/list.html'
+    # renderer_classes = (renderers.TemplateHTMLRenderer, renderers.JSONRenderer)
+    # template_name = 'worktable/order/list.html'
 
     def get_queryset(self):
         qs = super().get_queryset()
