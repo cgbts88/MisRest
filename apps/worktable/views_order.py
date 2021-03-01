@@ -7,10 +7,11 @@ from django.db.models import Q
 from django.shortcuts import HttpResponse, get_object_or_404
 from django.views.generic.base import View
 
-from rest_framework import renderers, permissions
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.views import APIView
 from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
 from rest_framework.generics import GenericAPIView
+from rest_framework.viewsets import ModelViewSet
+from rest_framework import renderers, permissions
 from rest_framework.response import Response
 
 from apps.utils.custom import MisCreateView, MisDeleteView
@@ -43,8 +44,8 @@ class WorkOrderView(ModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     filter_class = WorkOrderFilter
-    # renderer_classes = (renderers.TemplateHTMLRenderer, renderers.JSONRenderer)
-    # template_name = 'worktable/order/list.html'
+    renderer_classes = (renderers.TemplateHTMLRenderer, renderers.JSONRenderer)
+    template_name = 'worktable/order/list.html'
 
     def get_queryset(self):
         qs = super().get_queryset()
