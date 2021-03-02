@@ -20,7 +20,6 @@ urlpatterns = [
     # Form_A Router
     path('order/', views_order.WorkOrderView.as_view(), name='order-list'),
     path('order/create/', views_order.WorkOrderCreateView.as_view({'get': 'get', 'post': 'create'}), name='order-create'),
-    path('order/instead/', views_order.WorkOrderInsteadView.as_view({'get': 'get', 'post': 'create'}), name='order-instead'),
     path('order/delete/', views_order.WorkOrderDeleteView.as_view(), name='order-delete'),
     re_path(r'^order/detail/(?P<pk>\d+)$', views_order.WorkOrderDetailView.as_view(), name='order-detail'),
     # path('order/detail/', views_order.WorkOrderDetailView.as_view(), name='order-detail'),

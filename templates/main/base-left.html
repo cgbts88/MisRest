@@ -44,7 +44,6 @@
   <br clear="all"/>
   <ol class="breadcrumb">
     {% if 'create' in request.action_list %}<li><button title='新増' id='btnCreate'>新増</button></li>{% endif %}
-    {% if 'instead' in request.action_list %}<li><button title='代开' id='btnInstead'>代开</button></li>{% endif %}
     {% if 'delete' in request.action_list %}<li><button title='删除' id='btnDelete'>删除</button></li>{% endif %}
     {% if 'done' in request.action_list %}<li><button title='报废' id='btnDone'>报废</button></li>{% endif %}
     {% if 'cancel' in request.action_list %}<li><button title='闲置' id='btnCancel'>闲置</button></li>{% endif %}

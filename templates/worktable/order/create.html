@@ -9,6 +9,26 @@
               <h4>日常工单</h4>
             </legend>
 
+              {% if request.user.department.simple_title == 'EDP' %}
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">用戶</label>
+                <div class="col-sm-3">
+                  <select class="form-control select2" name="proposer">
+                  <option value="">--请选择用戶--</option>
+                  {% for user in users %}
+                      {% if user.id == request.user.id %}
+                  <option value="{{ user.id }}" selected>{{ user.username }} | {{ user }}</option>
+                      {% else %}
+                  <option value="{{ user.id }}">{{ user.username }} | {{ user }}</option>
+                      {% endif %}
+                  {% endfor %}
+                 </select>
+                </div>
+            </div>
+              {% else %}
+            <input name="proposer" type="hidden" value="{{ request.user.id }}"/>
+              {% endif %}
+
             <div class="form-group has-feedback">
                 <label class="col-sm-2 control-label">工单类型</label>
                 <div class="col-sm-3">
@@ -50,8 +70,8 @@
                 url: "{% url 'worktable:order-create' %}",
                 data: data,
                 cache: false,
-                success: function (msg) {
-                    if (msg.result) {
+                success: function (status) {
+                    if (status==201) {
                         layer.alert('数据保存成功！', {icon: 1}, function (index) {
                             window.location.href = "{% url 'worktable:order-list' %}";
                         });

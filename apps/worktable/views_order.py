@@ -91,17 +91,25 @@ class WorkOrderCreateView(ModelViewSet):
     serializer_class = WorkOrderSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
-    renderer_classes = (renderers.TemplateHTMLRenderer, renderers.JSONRenderer)
-    template_name = 'worktable/order/create.html'
+    #renderer_classes = (renderers.TemplateHTMLRenderer, renderers.JSONRenderer)
+    #template_name = 'worktable/order/create.html'
 
     def get(self, *args, **kwargs):
         kwargs['types'] = WorkOrder.TYPES
+        kwargs['users'] = User.objects.all().exclude(Q(username='admin') | Q(email=''))
         return Response(kwargs)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def perform_create(self, serializer):
         form = {
             'num': build_order_num('A'),
-            'proposer': self.request.user,
+            'proposer': User.objects.get(id=self.request.POST['proposer']),
             'state': 'wait',
         }
         serializer.save(**form)
@@ -137,30 +145,6 @@ class WorkOrderDetailView(RetrieveModelMixin, UpdateModelMixin, GenericAPIView):
         }
         # print(json_dumps(serializer.data, sort_keys=True, indent=4, separators=(', ', ': ')))
         return Response(ret)
-
-
-class WorkOrderInsteadView(ModelViewSet):
-    queryset = WorkOrder.objects.all()
-    serializer_class = WorkOrderSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-
-    renderer_classes = (renderers.TemplateHTMLRenderer, renderers.JSONRenderer)
-    template_name = 'worktable/order/instead.html'
-
-    def get(self, *args, **kwargs):
-        kwargs['types'] = WorkOrder.TYPES
-        kwargs['users'] = User.objects.all().exclude(Q(username='admin') | Q(email=''))
-        return Response(kwargs)
-
-    def perform_create(self, serializer):
-        form = {
-            'num': build_order_num('A'),
-            'proposer': User.objects.get(id=self.request.POST['proposer']),
-            'state': 'wait',
-        }
-        serializer.save(**form)
-        order_record(recorder=form['proposer'], num=form['num'], record_type="create")
-        send_work_order_message(form['num'])
 
 
 class WorkOrderDeleteView(MisDeleteView):
