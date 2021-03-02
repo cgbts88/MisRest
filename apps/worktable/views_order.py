@@ -8,11 +8,13 @@ from django.shortcuts import HttpResponse, get_object_or_404
 from django.views.generic.base import View
 
 from rest_framework.views import APIView
-from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
+from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin,\
+    UpdateModelMixin, DestroyModelMixin
 from rest_framework.generics import GenericAPIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import renderers, permissions
 from rest_framework.response import Response
+from rest_framework import status
 
 from apps.utils.custom import MisCreateView, MisDeleteView
 from apps.utils.mixin import LoginRequiredMixin
@@ -23,12 +25,11 @@ from apps.utils.util import form_invalid_msg
 from apps.worktable.models import WorkOrder, WorkOrderLog
 from apps.users.models import Department
 
-from apps.worktable.serializers import WorkOrderSerializer, WorkOrderLogSerializer
-from apps.users.serializers import DepartmentSerializer
+from apps.worktable.serializers import WorkOrderSerializer, WorkOrderListSerializer, WorkOrderLogSerializer
+from apps.users.serializers import DepartmentForSelectSerializer
 
 from apps.worktable.permissions import IsOwnerOrReadOnly
 from apps.worktable.filters import WorkOrderFilter
-from apps.worktable.forms import OrderForm, InsteadForm
 
 User = get_user_model()
 
@@ -38,14 +39,14 @@ Here is WorkOrder Views
 """
 
 
-class WorkOrderView(ModelViewSet):
+class WorkOrderView(ListModelMixin, GenericAPIView):
     queryset = WorkOrder.objects.all().order_by("-id")
-    serializer_class = WorkOrderSerializer
+    serializer_class = WorkOrderListSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-
     filter_class = WorkOrderFilter
-    # renderer_classes = (renderers.TemplateHTMLRenderer, renderers.JSONRenderer)
-    # template_name = 'worktable/order/list.html'
+
+    renderer_classes = (renderers.TemplateHTMLRenderer, renderers.JSONRenderer)
+    template_name = 'worktable/order/list.html'
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -59,9 +60,7 @@ class WorkOrderView(ModelViewSet):
             qs = qs.filter(id__in=obj_id_list)
         return qs
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        page = self.paginate_queryset(queryset)
+    def get(self, request, *args, **kwargs):
         work_order_log = WorkOrderLog.objects.filter(record_type='create').values('record_time').first()
         date_start = datetime.now()
         date_end = work_order_log['record_time']
@@ -69,18 +68,45 @@ class WorkOrderView(ModelViewSet):
         while date_start > date_end:
             date_list.append(str(date_start.year) + '-' + str(date_start.month).zfill(2))
             date_start -= relativedelta(months=1)
-        departments = DepartmentSerializer(Department.objects.all(), many=True)
+        departments = DepartmentForSelectSerializer(Department.objects.values('id', 'simple_title'), many=True)
+        results = {
+            'departments': departments.data,
+            'date_list': date_list,
+        }
+
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
-            results = {
-                'data': serializer.data,
-                'departments': departments.data,
-                'date_list': date_list,
-            }
+            results['data'] = serializer.data
             return self.get_paginated_response(results)
+        else:
+            serializer = self.get_serializer(self.get_queryset(), many=True)
+            results['data'] = serializer.data
+        return self.list(request, results)
+
+
+class WorkOrderCreateView(ModelViewSet):
+    queryset = WorkOrder.objects.all()
+    serializer_class = WorkOrderSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    renderer_classes = (renderers.TemplateHTMLRenderer, renderers.JSONRenderer)
+    template_name = 'worktable/order/create.html'
+
+    def get(self, *args, **kwargs):
+        kwargs['types'] = WorkOrder.TYPES
+        return Response(kwargs)
 
     def perform_create(self, serializer):
-        serializer.save(proposer=self.request.user)
+        form = {
+            'num': build_order_num('A'),
+            'proposer': self.request.user,
+            'state': 'wait',
+        }
+        serializer.save(**form)
+        order_record(recorder=form['proposer'], num=form['num'], record_type="create")
+        send_work_order_message(form['num'])
 
 
 class WorkOrderDetailView(RetrieveModelMixin, UpdateModelMixin, GenericAPIView):
@@ -112,68 +138,29 @@ class WorkOrderDetailView(RetrieveModelMixin, UpdateModelMixin, GenericAPIView):
         # print(json_dumps(serializer.data, sort_keys=True, indent=4, separators=(', ', ': ')))
         return Response(ret)
 
-    def put(self, request, *args, **kwargs):
-        print("到这")
-        return self.partial_update(request, *args, **kwargs)
 
-    # def delete(self, request, *args, **kwargs):
-    #    return self.destroy(request, *args, **kwargs)
+class WorkOrderInsteadView(ModelViewSet):
+    queryset = WorkOrder.objects.all()
+    serializer_class = WorkOrderSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
-    def perform_update(self, serializer):
-        pass
-
-
-class WorkOrderCreateView(MisCreateView):
-    model = WorkOrder
-    form_class = OrderForm
-    template_name = 'worktable/order/create.html'
-
-    def get_context_data(self, **kwargs):
-        kwargs['types'] = WorkOrder.TYPES
-        return super().get_context_data(**kwargs)
-
-    def post(self, request, *args, **kwargs):
-        res = dict(result=False)
-        form = self.get_form()
-        if form.is_valid():
-            new_form = form.save(commit=False)
-            new_form.num = build_order_num('A')
-            new_form.proposer = request.user
-            new_form.state = 'wait'
-            new_form.save()
-            order_record(recorder=new_form.proposer, num=new_form.num, record_type="create")
-            send_work_order_message(new_form.num)
-            res['result'] = True
-        else:
-            res = form_invalid_msg(form)
-        return HttpResponse(json_dumps(res), content_type='application/json')
-
-
-class WorkOrderInsteadView(MisCreateView):
-    model = WorkOrder
-    form_class = InsteadForm
+    renderer_classes = (renderers.TemplateHTMLRenderer, renderers.JSONRenderer)
     template_name = 'worktable/order/instead.html'
 
-    def get_context_data(self, **kwargs):
+    def get(self, *args, **kwargs):
         kwargs['types'] = WorkOrder.TYPES
         kwargs['users'] = User.objects.all().exclude(Q(username='admin') | Q(email=''))
-        return super().get_context_data(**kwargs)
+        return Response(kwargs)
 
-    def post(self, request, *args, **kwargs):
-        res = dict(result=False)
-        form = self.get_form()
-        if form.is_valid():
-            new_form = form.save(commit=False)
-            new_form.num = build_order_num('A')
-            new_form.proposer = User.objects.get(id=request.POST['proposer'])
-            new_form.state = 'wait'
-            new_form.save()
-            order_record(recorder=new_form.proposer, num=new_form.num, record_type="create")
-            send_work_order_message(new_form.num)
-            res['result'] = True
-        else:
-            res = form_invalid_msg(form)
-        return HttpResponse(json_dumps(res), content_type='application/json')
+    def perform_create(self, serializer):
+        form = {
+            'num': build_order_num('A'),
+            'proposer': User.objects.get(id=self.request.POST['proposer']),
+            'state': 'wait',
+        }
+        serializer.save(**form)
+        order_record(recorder=form['proposer'], num=form['num'], record_type="create")
+        send_work_order_message(form['num'])
 
 
 class WorkOrderDeleteView(MisDeleteView):

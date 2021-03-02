@@ -6,9 +6,15 @@ User = get_user_model()
 
 
 class DepartmentSerializer(serializers.ModelSerializer):
-    simple_title = serializers.CharField(required=False)
 
     class Meta:
         model = Department
         fields = '__all__'
         read_only_fields = ('id',)
+
+
+class DepartmentForSelectSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Department
+        fields = ['id', 'simple_title']

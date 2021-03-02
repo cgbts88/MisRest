@@ -41,8 +41,8 @@ class CommonPagination(PageNumberPagination):
                 pages.append({'num': page, 'link': '?page={}'.format(page)})
 
         return Response(OrderedDict([
+            ('results', data),
             ('pages', pages),
             ('next', self.get_next_link()),
             ('previous', self.get_previous_link()),
-            ('results', data)
         ]))
