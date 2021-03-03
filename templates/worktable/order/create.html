@@ -13,13 +13,13 @@
             <div class="form-group has-feedback">
                 <label class="col-sm-2 control-label">用戶</label>
                 <div class="col-sm-3">
-                  <select class="form-control select2" name="proposer">
+                  <select class="form-control select2" name="proposer_id">
                   <option value="">--请选择用戶--</option>
                   {% for user in users %}
                       {% if user.id == request.user.id %}
-                  <option value="{{ user.id }}" selected>{{ user.username }} | {{ user }}</option>
+                  <option value="{{ user.id }}" selected>{{ user.username }} | {{ user.display_name }}</option>
                       {% else %}
-                  <option value="{{ user.id }}">{{ user.username }} | {{ user }}</option>
+                  <option value="{{ user.id }}">{{ user.username }} | {{ user.display_name }}</option>
                       {% endif %}
                   {% endfor %}
                  </select>
@@ -70,16 +70,15 @@
                 url: "{% url 'worktable:order-create' %}",
                 data: data,
                 cache: false,
-                success: function (status) {
-                    if (status==201) {
+                statusCode: {
+                    401: function () {
+                        layer.alert('错误！', {icon: 5});
+                    },
+                    201: function () {
                         layer.alert('数据保存成功！', {icon: 1}, function (index) {
                             window.location.href = "{% url 'worktable:order-list' %}";
                         });
-                    } else {
-                        layer.alert(msg.error, {icon: 5});
-                        //$('errorMessage').html(msg.message)
-                    }
-                    return;
+                    },
                 }
             });
         });

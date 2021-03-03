@@ -26,6 +26,7 @@
                   <input class="form-group" name="u" type="text" value="" placeholder="例如：zhangsan"/>
                     {% endif %}
                 </li>
+                <li class="form-group searchArea margin-r-5 margin-top-5">
                   <label>　　月份：</label>
                   <select class="form-group searchArea margin-r-5 margin-top-5" name="t">
                         <option value="">-- ALL --</option>
@@ -87,9 +88,9 @@
                     <th>{{ item.state }}</th>
                     <th>
                         {% if 'detail' in request.action_list %}
-                            <button title='详情' onclick="doDetail('{% url 'worktable:order-detail' item.id %}')">详情</button>
+                            <button title='详情' onclick="doDetail('{% url 'worktable:order-detail' item.num %}')">详情</button>
                         {% else %}
-                            <button title='详情' onclick="doDetail('{% url 'worktable:order-detail' item.id %}')" disabled="disabled">详情</button>
+                            <button title='详情' onclick="doDetail('{% url 'worktable:order-detail' item.num %}')" disabled="disabled">详情</button>
                         {% endif %}
                     </th>
                 </tr>
@@ -116,50 +117,50 @@
         window.location.href = num;
     }
 
-	//批量删除
-	$("#btnDelete").click(function() {
-		if ($("input[name='checkList']:checked").length == 0){
-			layer.msg("请选择要删除的记录");
-			return ;
-		}
+    //批量删除
+    $("#btnDelete").click(function() {
+        if ($("input[name='checkList']:checked").length == 0){
+            layer.msg("请选择要删除的记录");
+            return ;
+        }
 
-		var arrId= new Array();
-		$("input[name='checkList']:checked").each(function(){
-			//alert($(this).val());
-			arrId.push($(this).val());
-		});
+        var arrId= new Array();
+        $("input[name='checkList']:checked").each(function(){
+            //alert($(this).val());
+            arrId.push($(this).val());
+        });
 
-		sId=arrId.join(',');
+        sId=arrId.join(',');
 
-		layer.alert('确定删除吗？', {
-			title:'提示'
-			,icon: 3 //0:感叹号 1：对号 2：差号 3：问号 4：小锁 5：哭脸 6：笑脸
-			,time: 0 //不自动关闭
-			,btn: ['YES', 'NO']
-			,yes: function(index){
-			 	layer.close(index);
-			 	$.ajax({
-					type: "POST",
-					url : "{% url 'worktable:order-delete' %}",
-					data : {"id":sId, csrfmiddlewaretoken: '{{ csrf_token }}'},
-					cache: false,
-					success : function(msg) {
-						if (msg.result){
-							layer.alert("操作成功",{icon:1});
-							window.location.href = "{% url 'worktable:order-list' %}";
-						}else{
-							//alert(msg.message);
-							window.location.href = "{% url 'worktable:order-list' %}";
-						}
-						return ;
-					}
-				});
-			}
-		});
-	});
+        layer.alert('确定删除吗？', {
+            title:'提示'
+            ,icon: 3 //0:感叹号 1：对号 2：差号 3：问号 4：小锁 5：哭脸 6：笑脸
+            ,time: 0 //不自动关闭
+            ,btn: ['YES', 'NO']
+            ,yes: function(index){
+                layer.close(index);
+                $.ajax({
+                    type: "POST",
+                    url : "{% url 'worktable:order-list' %}",
+                    data : {"id":sId, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                    cache: false,
+                    statusCode: {
+                        401: function () {
+                            layer.alert('错误！', {icon: 5});
+                        },
+                        204: function () {
+                            layer.alert('删除成功！', {icon: 1}, function (index) {
+                                window.location.href = "{% url 'worktable:order-list' %}";
+                            });
+                        },
+                    }
+                });
+            }
+        });
+    });
 
         $("#btnReset").click(function () {
-	        window.location.href = "{% url 'worktable:order-list' %}";
+            window.location.href = "{% url 'worktable:order-list' %}";
         })
 </script>
 {% endblock %}

@@ -14,6 +14,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import renderers, permissions
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from rest_framework import status
 
 from apps.utils.custom import MisCreateView, MisDeleteView
@@ -26,7 +27,7 @@ from apps.worktable.models import WorkOrder, WorkOrderLog
 from apps.users.models import Department
 
 from apps.worktable.serializers import WorkOrderSerializer, WorkOrderListSerializer, WorkOrderLogSerializer
-from apps.users.serializers import DepartmentForSelectSerializer
+from apps.users.serializers import UserForSelectSerializer, DepartmentForSelectSerializer
 
 from apps.worktable.permissions import IsOwnerOrReadOnly
 from apps.worktable.filters import WorkOrderFilter
@@ -39,7 +40,7 @@ Here is WorkOrder Views
 """
 
 
-class WorkOrderView(ListModelMixin, GenericAPIView):
+class WorkOrderView(ModelViewSet):
     queryset = WorkOrder.objects.all().order_by("-id")
     serializer_class = WorkOrderListSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
@@ -85,18 +86,29 @@ class WorkOrderView(ListModelMixin, GenericAPIView):
             results['data'] = serializer.data
         return self.list(request, results)
 
+    @action(methods=['delete'], detail=False)
+    def multiple_delete(self, request, *args, **kwargs):
+        delete_id = request.POST.get('id', None)
+        if not delete_id:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        for i in delete_id.split(','):
+            get_object_or_404(WorkOrder, pk=int(i)).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class WorkOrderCreateView(ModelViewSet):
     queryset = WorkOrder.objects.all()
     serializer_class = WorkOrderSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
-    #renderer_classes = (renderers.TemplateHTMLRenderer, renderers.JSONRenderer)
-    #template_name = 'worktable/order/create.html'
+    renderer_classes = (renderers.TemplateHTMLRenderer, renderers.JSONRenderer)
+    template_name = 'worktable/order/create.html'
 
     def get(self, *args, **kwargs):
+        users = User.objects.all().exclude(Q(username='admin') | Q(email=''))
+        users_serializer = UserForSelectSerializer(users, many=True)
+        kwargs['users'] = users_serializer.data
         kwargs['types'] = WorkOrder.TYPES
-        kwargs['users'] = User.objects.all().exclude(Q(username='admin') | Q(email=''))
         return Response(kwargs)
 
     def create(self, request, *args, **kwargs):
@@ -109,18 +121,19 @@ class WorkOrderCreateView(ModelViewSet):
     def perform_create(self, serializer):
         form = {
             'num': build_order_num('A'),
-            'proposer': User.objects.get(id=self.request.POST['proposer']),
+            'proposer': User.objects.get(id=self.request.data['proposer_id']),
             'state': 'wait',
         }
         serializer.save(**form)
         order_record(recorder=form['proposer'], num=form['num'], record_type="create")
-        send_work_order_message(form['num'])
+        # send_work_order_message(form['num'])
 
 
-class WorkOrderDetailView(RetrieveModelMixin, UpdateModelMixin, GenericAPIView):
+class WorkOrderDetailView(ModelViewSet):
     queryset = WorkOrder.objects.all()
     serializer_class = WorkOrderSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+    lookup_field = 'num'
 
     renderer_classes = (renderers.TemplateHTMLRenderer, renderers.JSONRenderer)
     template_name = 'worktable/order/detail.html'
@@ -145,11 +158,6 @@ class WorkOrderDetailView(RetrieveModelMixin, UpdateModelMixin, GenericAPIView):
         }
         # print(json_dumps(serializer.data, sort_keys=True, indent=4, separators=(', ', ': ')))
         return Response(ret)
-
-
-class WorkOrderDeleteView(MisDeleteView):
-    model = WorkOrder
-    success_url = 'worktable/order'
 
 
 class WorkOrderProcessView(LoginRequiredMixin, View):

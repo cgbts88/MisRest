@@ -9,6 +9,9 @@ router = DefaultRouter()
 router.register(r'order', views_order.WorkOrderView, basename='order')
 urlpatterns = router.urls
 """
+order_list = views_order.WorkOrderView.as_view({'get': 'get', 'post': 'multiple_delete'})
+order_create = views_order.WorkOrderCreateView.as_view({'get': 'get', 'post': 'create',})
+order_detail = views_order.WorkOrderDetailView.as_view({'get': 'get',})
 urlpatterns = [
 
     path('', views.WorktableIndexView.as_view(), name='index'),
@@ -18,15 +21,9 @@ urlpatterns = [
     path('person/passwdchange/', views. PersonPasswordChangeView.as_view(), name='passwdchange'),
 
     # Form_A Router
-    path('order/', views_order.WorkOrderView.as_view(), name='order-list'),
-    path('order/create/', views_order.WorkOrderCreateView.as_view({'get': 'get', 'post': 'create'}), name='order-create'),
-    path('order/delete/', views_order.WorkOrderDeleteView.as_view(), name='order-delete'),
-    re_path(r'^order/detail/(?P<pk>\d+)$', views_order.WorkOrderDetailView.as_view(), name='order-detail'),
-    # path('order/detail/', views_order.WorkOrderDetailView.as_view(), name='order-detail'),
-    path('order/process/', views_order.WorkOrderProcessView.as_view(), name='order-process'),
-    path('order/finish/', views_order.WorkOrderFinishView.as_view(), name='order-finish'),
-    path('order/confirm/', views_order.WorkOrderConfirmView.as_view(), name='order-confirm'),
-
+    path('order/', order_list, name='order-list'),
+    path('order/create/', order_create, name='order-create'),
+    re_path(r'^order/(?P<num>\w-\d{10})$', order_detail, name='order-detail'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

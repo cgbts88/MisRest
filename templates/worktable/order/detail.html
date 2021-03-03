@@ -83,7 +83,7 @@
             var data = $("#addForm").serialize();
             $.ajax({
                 type: $("#addForm").attr('method'),
-                url: "{% url 'worktable:order-detail' result.id %}",
+                url: "{% url 'worktable:order-detail' result.num %}",
                 data: data,
                 cache: false,
                 success: function (msg) {
@@ -104,13 +104,13 @@
             var data = $("#addForm").serialize();
             $.ajax({
                 type: $("#addForm").attr('method'),
-                url: "{% url 'worktable:order-process' %}",
+                url: "{% url 'worktable:order-detail' result.num %}",
                 data: data,
                 cache: false,
                 success: function (msg) {
                     if (msg.result) {
-                        layer.alert('正在处理！', {icon: 1}, function (index) {
-                            window.location.reload();
+                        layer.alert('数据保存成功！', {icon: 1}, function (index) {
+                            window.location.href = "{% url 'worktable:order-list' %}";
                         });
                     } else {
                         layer.alert(msg.error, {icon: 5});
@@ -125,12 +125,12 @@
             var data = $("#addForm").serialize();
             $.ajax({
                 type: $("#addForm").attr('method'),
-                url: "{% url 'worktable:order-finish' %}",
+                url: "{% url 'worktable:order-detail' result.num %}",
                 data: data,
                 cache: false,
                 success: function (msg) {
                     if (msg.result) {
-                        layer.alert('处理完成！', {icon: 1}, function (index) {
+                        layer.alert('数据保存成功！', {icon: 1}, function (index) {
                             window.location.href = "{% url 'worktable:order-list' %}";
                         });
                     } else {
@@ -146,12 +146,12 @@
             var data = $("#addForm").serialize();
             $.ajax({
                 type: $("#addForm").attr('method'),
-                url: "{% url 'worktable:order-confirm' %}",
+                url: "{% url 'worktable:order-detail' result.num %}",
                 data: data,
                 cache: false,
                 success: function (msg) {
                     if (msg.result) {
-                        layer.alert('确认完成！', {icon: 1}, function (index) {
+                        layer.alert('数据保存成功！', {icon: 1}, function (index) {
                             window.location.href = "{% url 'worktable:order-list' %}";
                         });
                     } else {
