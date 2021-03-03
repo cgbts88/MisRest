@@ -159,47 +159,22 @@ class WorkOrderDetailView(ModelViewSet):
         # print(json_dumps(serializer.data, sort_keys=True, indent=4, separators=(', ', ': ')))
         return Response(ret)
 
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if 'action' in request.data and request.data['action'] == 'process':
+            data = {'state': 'process'}
+        else:
+            data = request.data
+        print("测试1=====", data)
+        serializer = self.get_serializer(instance, data=data, partial=True)
+        print("才到这~~~~")
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
 
-class WorkOrderProcessView(LoginRequiredMixin, View):
-
-    @staticmethod
-    def post(request):
-        res = dict(result=False)
-        if 'id' in request.POST and request.POST['id']:
-            work_order = get_object_or_404(WorkOrder, pk=request.POST['id'])
-            work_order.state = 'process'
-            work_order.save()
-            order_record(recorder=request.user, num=request.POST['num'], record_type="process")
-            send_work_order_message(work_order.num)
-            res['result'] = True
-            return HttpResponse(json_dumps(res), content_type='application/json')
-
-
-class WorkOrderFinishView(LoginRequiredMixin, View):
-
-    @staticmethod
-    def post(request):
-        res = dict(result=False)
-        if 'id' in request.POST and request.POST['id']:
-            work_order = get_object_or_404(WorkOrder, pk=request.POST['id'])
-            work_order.state = 'finish'
-            work_order.save()
-            order_record(recorder=request.user, num=request.POST['num'], record_type="finish")
-            send_work_order_message(work_order.num)
-            res['result'] = True
-            return HttpResponse(json_dumps(res), content_type='application/json')
-
-
-class WorkOrderConfirmView(LoginRequiredMixin, View):
-
-    @staticmethod
-    def post(request):
-        res = dict(result=False)
-        if 'id' in request.POST and request.POST['id']:
-            work_order = get_object_or_404(WorkOrder, pk=request.POST['id'])
-            work_order.state = 'confirm'
-            work_order.save()
-            order_record(recorder=request.user, num=request.POST['num'], record_type="confirm")
-            send_work_order_message(work_order.num)
-            res['result'] = True
-            return HttpResponse(json_dumps(res), content_type='application/json')
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+        print("到这了~~~~")
+        print("测试2=====", serializer.data)
+        return Response(serializer.data)

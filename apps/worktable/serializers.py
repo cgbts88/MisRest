@@ -60,7 +60,4 @@ class WorkOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkOrder
         fields = '__all__'
-        read_only_fields = ('id', 'num', 'proposer', 'state')
-
-    def create(self, validated_data):
-        return WorkOrder.objects.create(**validated_data)
+        read_only_fields = ('id', 'num', 'proposer')

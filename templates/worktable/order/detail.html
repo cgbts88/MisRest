@@ -3,7 +3,6 @@
 <div class="box box-danger">
 	<form class="form-horizontal" id="addForm" method="post">
 		{% csrf_token %}
-		<input type="hidden" name='id' value="{{ result.id }}" />
 		<div class="box-body">
           <fieldset>
             <legend>
@@ -13,7 +12,7 @@
             <div class="form-group has-feedback">
                 <label class="col-sm-2 control-label">单号</label>
                 <div class="col-sm-3">
-                    <input type="text" name='num' value="{{ result.num }}" readonly="readonly"/>
+                    <input type="text" value="{{ result.num }}" readonly="readonly"/>
                     </div>
             </div>
 
@@ -82,83 +81,76 @@
         $("#btnEdit").click(function () {
             var data = $("#addForm").serialize();
             $.ajax({
-                type: $("#addForm").attr('method'),
+                type: "POST",
                 url: "{% url 'worktable:order-detail' result.num %}",
                 data: data,
                 cache: false,
-                success: function (msg) {
-                    if (msg.result) {
-                        layer.alert('数据保存成功！', {icon: 1}, function (index) {
-                            window.location.href = "{% url 'worktable:order-list' %}";
+                statusCode: {
+                    400: function () {
+                    layer.alert('错误！', {icon: 5});
+                    },
+                    200: function () {
+                        layer.alert('操作成功！', {icon: 1}, function (index) {
+                        window.location.href = "{% url 'worktable:order-list' %}";
                         });
-                    } else {
-                        layer.alert(msg.error, {icon: 5});
-                        //$('errorMessage').html(msg.message)
-                    }
-                    return;
+                    },
                 }
             });
         });
 
         $("#btnProcess").click(function () {
-            var data = $("#addForm").serialize();
             $.ajax({
-                type: $("#addForm").attr('method'),
+                type: "POST",
                 url: "{% url 'worktable:order-detail' result.num %}",
-                data: data,
+                data: {action:'process', csrfmiddlewaretoken: '{{ csrf_token }}'},
                 cache: false,
-                success: function (msg) {
-                    if (msg.result) {
-                        layer.alert('数据保存成功！', {icon: 1}, function (index) {
-                            window.location.href = "{% url 'worktable:order-list' %}";
+                statusCode: {
+                    400: function () {
+                    layer.alert('错误！', {icon: 5});
+                    },
+                    200: function () {
+                        layer.alert('操作成功！', {icon: 1}, function (index) {
+                        window.location.href = "{% url 'worktable:order-list' %}";
                         });
-                    } else {
-                        layer.alert(msg.error, {icon: 5});
-                        //$('errorMessage').html(msg.message)
-                    }
-                    return;
+                    },
                 }
             });
         });
 
         $("#btnFinish").click(function () {
-            var data = $("#addForm").serialize();
             $.ajax({
-                type: $("#addForm").attr('method'),
+                type: "POST",
                 url: "{% url 'worktable:order-detail' result.num %}",
-                data: data,
+                data: {action:'finish', csrfmiddlewaretoken: '{{ csrf_token }}'},
                 cache: false,
-                success: function (msg) {
-                    if (msg.result) {
-                        layer.alert('数据保存成功！', {icon: 1}, function (index) {
-                            window.location.href = "{% url 'worktable:order-list' %}";
+                statusCode: {
+                    401: function () {
+                    layer.alert('错误！', {icon: 5});
+                    },
+                    200: function () {
+                        layer.alert('操作成功！', {icon: 1}, function (index) {
+                        window.location.href = "{% url 'worktable:order-list' %}";
                         });
-                    } else {
-                        layer.alert(msg.error, {icon: 5});
-                        //$('errorMessage').html(msg.message)
-                    }
-                    return;
+                    },
                 }
             });
         });
 
         $("#btnConfirm").click(function () {
-            var data = $("#addForm").serialize();
             $.ajax({
-                type: $("#addForm").attr('method'),
+                type: "POST",
                 url: "{% url 'worktable:order-detail' result.num %}",
-                data: data,
+                data: {action:'confirm', csrfmiddlewaretoken: '{{ csrf_token }}'},
                 cache: false,
-                success: function (msg) {
-                    if (msg.result) {
-                        layer.alert('数据保存成功！', {icon: 1}, function (index) {
-                            window.location.href = "{% url 'worktable:order-list' %}";
+                statusCode: {
+                    401: function () {
+                    layer.alert('错误！', {icon: 5});
+                    },
+                    200: function () {
+                        layer.alert('操作成功！', {icon: 1}, function (index) {
+                        window.location.href = "{% url 'worktable:order-list' %}";
                         });
-                    } else {
-                        layer.alert(msg.error, {icon: 5});
-                        //$('errorMessage').html(msg.message)
-                    }
-                    return;
+                    },
                 }
             });
         });

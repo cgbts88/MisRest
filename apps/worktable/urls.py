@@ -11,7 +11,7 @@ urlpatterns = router.urls
 """
 order_list = views_order.WorkOrderView.as_view({'get': 'get', 'post': 'multiple_delete'})
 order_create = views_order.WorkOrderCreateView.as_view({'get': 'get', 'post': 'create',})
-order_detail = views_order.WorkOrderDetailView.as_view({'get': 'get',})
+order_detail = views_order.WorkOrderDetailView.as_view({'get': 'get', 'post': 'update'})
 urlpatterns = [
 
     path('', views.WorktableIndexView.as_view(), name='index'),
