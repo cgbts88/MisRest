@@ -1,17 +1,13 @@
 from django.urls import path, re_path
 from rest_framework.urlpatterns import format_suffix_patterns
-from rest_framework.routers import DefaultRouter
 
 from apps.worktable import views, views_order
 
-"""
-router = DefaultRouter()
-router.register(r'order', views_order.WorkOrderView, basename='order')
-urlpatterns = router.urls
-"""
+
 order_list = views_order.WorkOrderView.as_view({'get': 'get', 'post': 'multiple_delete'})
 order_create = views_order.WorkOrderCreateView.as_view({'get': 'get', 'post': 'create',})
 order_detail = views_order.WorkOrderDetailView.as_view({'get': 'get', 'post': 'update'})
+
 urlpatterns = [
 
     path('', views.WorktableIndexView.as_view(), name='index'),

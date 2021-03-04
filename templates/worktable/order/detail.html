@@ -1,9 +1,9 @@
 {% load static %}
 {% block content %}
 <div class="box box-danger">
-	<form class="form-horizontal" id="addForm" method="post">
-		{% csrf_token %}
-		<div class="box-body">
+    <form class="form-horizontal" id="addForm" method="post">
+        {% csrf_token %}
+        <div class="box-body">
           <fieldset>
             <legend>
               <h4>日常工单</h4>
@@ -37,9 +37,9 @@
 
           </fieldset>
 
-		</div>
-		<div class="box-footer ">
-			<div class="row span7 text-center ">
+        </div>
+        <div class="box-footer ">
+            <div class="row span7 text-center ">
               {% for action in actions_list %}
                 {% if action.disabled == 'disabled' %}
                     <button type="button" id="btn{{ action.en_code }}" disabled="disabled">{{ action.cn_code }}</button>
@@ -87,12 +87,15 @@
                 cache: false,
                 statusCode: {
                     400: function () {
-                    layer.alert('错误！', {icon: 5});
+                        layer.alert('错误 400！', {icon: 5});
                     },
                     200: function () {
                         layer.alert('操作成功！', {icon: 1}, function (index) {
                         window.location.href = "{% url 'worktable:order-list' %}";
                         });
+                    },
+                    403: function () {
+                        layer.alert('错误 403！', {icon: 5});
                     },
                 }
             });
@@ -102,7 +105,7 @@
             $.ajax({
                 type: "POST",
                 url: "{% url 'worktable:order-detail' result.num %}",
-                data: {action:'process', csrfmiddlewaretoken: '{{ csrf_token }}'},
+                data: {csrfmiddlewaretoken: '{{ csrf_token }}', action:'process'},
                 cache: false,
                 statusCode: {
                     400: function () {
@@ -121,7 +124,7 @@
             $.ajax({
                 type: "POST",
                 url: "{% url 'worktable:order-detail' result.num %}",
-                data: {action:'finish', csrfmiddlewaretoken: '{{ csrf_token }}'},
+                data: {csrfmiddlewaretoken: '{{ csrf_token }}', action:'finish'},
                 cache: false,
                 statusCode: {
                     401: function () {
@@ -140,7 +143,7 @@
             $.ajax({
                 type: "POST",
                 url: "{% url 'worktable:order-detail' result.num %}",
-                data: {action:'confirm', csrfmiddlewaretoken: '{{ csrf_token }}'},
+                data: {csrfmiddlewaretoken: '{{ csrf_token }}', action:'confirm'},
                 cache: false,
                 statusCode: {
                     401: function () {

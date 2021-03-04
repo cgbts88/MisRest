@@ -150,6 +150,7 @@ class WorkOrderDetailView(ModelViewSet):
             'leader': ''
         }
         actions_list = action_menu(**parameter)
+
         ret = {
             'result': serializer.data,
             'types': WorkOrder.TYPES,
