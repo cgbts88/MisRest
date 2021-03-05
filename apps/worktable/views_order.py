@@ -1,27 +1,18 @@
-from json import dumps as json_dumps
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
 
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.shortcuts import HttpResponse, get_object_or_404
-from django.views.generic.base import View
 
-from rest_framework.views import APIView
-from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin,\
-    UpdateModelMixin, DestroyModelMixin
-from rest_framework.generics import GenericAPIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import renderers, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import status
 
-from apps.utils.custom import MisCreateView, MisDeleteView
-from apps.utils.mixin import LoginRequiredMixin
 from apps.utils.toolkit import build_order_num, order_record, action_menu
 from apps.utils.mailer import send_work_order_message
-from apps.utils.util import form_invalid_msg
 
 from apps.worktable.models import WorkOrder, WorkOrderLog
 from apps.users.models import Department
@@ -132,16 +123,18 @@ class WorkOrderCreateView(ModelViewSet):
 class WorkOrderDetailView(ModelViewSet):
     queryset = WorkOrder.objects.all()
     serializer_class = WorkOrderSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,)
     lookup_field = 'num'
 
     renderer_classes = (renderers.TemplateHTMLRenderer, renderers.JSONRenderer)
     template_name = 'worktable/order/detail.html'
 
+    record_type = None
+
     def get(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
-        logs = WorkOrderLogSerializer(WorkOrderLog.objects.filter(record_obj=instance.id), many=True)
+        logs = WorkOrderLogSerializer(WorkOrderLog.objects.filter(record_obj=instance.id).order_by('-id'), many=True)
         parameter = {
             'form_type': str(instance.num[0]),
             'current_user': self.request.user.id,
@@ -162,13 +155,13 @@ class WorkOrderDetailView(ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
-        if 'action' in request.data and request.data['action'] == 'process':
-            data = {'state': 'process'}
+        if 'action' in request.data:
+            data = {'state': request.data['action']}
+            self.record_type = request.data['action']
         else:
             data = request.data
-        print("测试1=====", data)
+            self.record_type = 'update'
         serializer = self.get_serializer(instance, data=data, partial=True)
-        print("才到这~~~~")
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
 
@@ -176,6 +169,10 @@ class WorkOrderDetailView(ModelViewSet):
             # If 'prefetch_related' has been applied to a queryset, we need to
             # forcibly invalidate the prefetch cache on the instance.
             instance._prefetched_objects_cache = {}
-        print("到这了~~~~")
-        print("测试2=====", serializer.data)
-        return Response(serializer.data)
+        # return Response(serializer.data)
+        return HttpResponse(serializer.data, content_type='application/json')
+
+    def perform_update(self, serializer):
+        serializer.save()
+        order_record(recorder=self.request.user, num=serializer.data['num'], record_type=self.record_type)
+        # send_work_order_message(form['num'])

@@ -2,7 +2,7 @@ import os
 import threading
 import smtplib
 import ssl
-from time import time
+from datetime import datetime
 
 from loguru import logger
 
@@ -91,7 +91,7 @@ class EmailThread(threading.Thread):
                     self._sender_email, str_to_list, message.as_string()
                 )
         except Exception as error:
-            logger.add("media\\log\\{time}.log")
+            logger.add("media\\log\\{}.log".format(datetime.now().strftime("%Y%m%d-%H%M")))
             logger.error(error)
 
 

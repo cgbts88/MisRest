@@ -166,7 +166,7 @@ EMAIL_HOST_PASSWORD = 'Ewig@2020'         # 發送郵件的郵箱密碼
 """
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': ('rest_framework.authentication.TokenAuthentication',),
+    # 'DEFAULT_AUTHENTICATION_CLASSES': ('rest_framework.authentication.TokenAuthentication',),
     'DATETIME_FORMAT': "%Y-%m-%d %H:%M",
     'DEFAULT_PAGINATION_CLASS': 'apps.utils.pagination.CommonPagination',
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
