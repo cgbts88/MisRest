@@ -113,7 +113,7 @@
                     },
                     200: function () {
                         layer.alert('操作成功！！', {icon: 1}, function (index) {
-                        window.location.href = "{% url 'worktable:order-list' %}";
+                        window.location.href = "{% url 'worktable:order-detail' result.num %}";
                         });
                     },
                 }
