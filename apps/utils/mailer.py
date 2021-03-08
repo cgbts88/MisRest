@@ -22,7 +22,7 @@ from utils.export import get_excel
 
 class EmailThread(threading.Thread):
     _sender_email = "robot@qsmfg.com"
-    _password = "Ewig@2020"
+    _password = "Ewig@2021"
 
     def __init__(self, subject, body, from_email, to, fail_silently, cc=None, attachments=None):
         self.subject = subject
